@@ -21,6 +21,7 @@ module.exports = {
       "error",
       {
         "semi": true,
+        "singleQuote": false,
         "endOfLine": "auto"
       }
     ],
