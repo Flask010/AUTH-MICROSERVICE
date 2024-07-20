@@ -8,12 +8,12 @@ import {
   Max,
   Min,
 } from "class-validator";
-import { UserRoles } from "src/infrastructure/db/enums/roles.enum";
+import { UserRoles } from "src/enums/roles/roles.enum";
 
-export class UserShortDTO {
-  @IsNotEmpty()
+export class UserResponseDTO {
+  @IsOptional()
   @IsString()
-  id: string;
+  id?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -27,17 +27,17 @@ export class UserShortDTO {
   @Max(100)
   email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  notifications: boolean;
+  notifications?: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
-  createdAt: Date;
+  createdAt?: Date;
 
   @IsArray()
-  @IsNotEmpty()
-  roles: UserRoles[];
+  @IsOptional()
+  roles?: UserRoles[];
 
   @IsOptional()
   @IsString()

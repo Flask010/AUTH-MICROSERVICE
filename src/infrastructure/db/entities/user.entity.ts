@@ -5,7 +5,7 @@ import {
   Entity,
   ObjectIdColumn,
 } from "typeorm";
-import { UserRoles } from "../enums/roles.enum";
+import { UserRoles } from "../../../enums/roles/roles.enum";
 import { ProfileEntity } from "./profile.entity";
 
 @Entity("user")
