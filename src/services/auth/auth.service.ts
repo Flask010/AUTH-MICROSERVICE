@@ -11,6 +11,8 @@ import { UserNotFoundException } from "src/common/exceptions/user/user-not-found
 import { UserDTO } from "src/dto/user/user.dto";
 import { InvalidPasswordException } from "src/common/exceptions/auth/invalid-password.exception";
 import { UserResponseDTO } from "src/dto/user/user-response.dto";
+import { RefreshTokenDTO } from "src/dto/auth/refresh-token.dto";
+import { ObjectId } from "mongodb";
 
 @Injectable()
 export class AuthService {
@@ -36,11 +38,11 @@ export class AuthService {
 
     const savedUser = await this.userRepository.save(newUser);
     const accessToken = this.tokenService.createAccessToken({
-      userId: savedUser.id,
+      userId: savedUser._id.toString(),
     });
 
     const userShortResponse: UserResponseDTO = {
-      id: savedUser.id,
+      id: savedUser._id.toString(),
       username: savedUser.username,
       email: savedUser.email,
       notifications: false,
@@ -66,11 +68,47 @@ export class AuthService {
     }
 
     const accessToken = this.tokenService.createAccessToken({
-      userId: user.id,
+      userId: user._id.toString(),
     });
     const refreshToken = await this.tokenService.createRefreshToken({
       email: model.email,
     });
+    await this.updateRefreshToken(user._id.toString(), refreshToken);
+
+    const userShortResponse: UserResponseDTO = {
+      username: user.username,
+      email: user.email,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
+
+    return userShortResponse;
+  }
+
+  async refreshToken(model: RefreshTokenDTO): Promise<UserResponseDTO> {
+    const decodedRefreshToken = await this.tokenService.decodeRefreshToken(
+      model.token,
+    );
+    const user: UserDTO = await this.userRepository.findOne({
+      where: {
+        email: decodedRefreshToken.email,
+      },
+    });
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+    const accessToken = this.tokenService.createAccessToken({
+      userId: user._id.toString(),
+    });
+    const refreshToken = await this.tokenService.createRefreshToken({
+      email: user.email,
+    });
+
+    await this.userRepository.update(
+      { _id: new ObjectId(user._id) },
+      { refreshToken },
+    );
 
     const userShortResponse: UserResponseDTO = {
       username: user.username,
@@ -102,5 +140,15 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
+  }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.userRepository.update(
+      { _id: new ObjectId(userId) },
+      { refreshToken },
+    );
   }
 }

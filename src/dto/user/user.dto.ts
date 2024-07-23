@@ -8,12 +8,13 @@ import {
   Max,
   Min,
 } from "class-validator";
+import { ObjectId } from "mongodb";
 import { UserRoles } from "src/enums/roles/roles.enum";
 
 export class UserDTO {
   @IsNotEmpty()
   @IsString()
-  id: string;
+  _id: ObjectId;
 
   @IsNotEmpty()
   @IsString()
@@ -38,10 +39,6 @@ export class UserDTO {
   @IsArray()
   @IsNotEmpty()
   roles: UserRoles[];
-
-  @IsOptional()
-  @IsString()
-  accessToken?: string;
 
   @IsOptional()
   @IsString()

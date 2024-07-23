@@ -35,6 +35,10 @@ export class UserResponseDTO {
   @IsDateString()
   createdAt?: Date;
 
+  @IsOptional()
+  @IsDateString()
+  updatedAt?: Date;
+
   @IsArray()
   @IsOptional()
   roles?: UserRoles[];

@@ -7,11 +7,12 @@ import {
 } from "typeorm";
 import { UserRoles } from "../../../enums/roles/roles.enum";
 import { ProfileEntity } from "./profile.entity";
+import { ObjectId } from "mongodb";
 
 @Entity("user")
 export class UserEntity {
   @ObjectIdColumn()
-  id: string;
+  _id: ObjectId;
 
   @Column({
     type: "varchar",
@@ -38,25 +39,26 @@ export class UserEntity {
     type: "varchar",
     length: 100,
     name: "password",
+    select: false,
   })
   password: string;
 
   @Column({
     type: "varchar",
     length: "500",
-    name: "refresh_token",
+    name: "refreshToken",
   })
   refreshToken: string;
 
   @Column({
     type: "timestamp",
-    name: "created_at",
+    name: "createdAt",
   })
   createdAt: Date;
 
   @Column({
     type: "timestamp",
-    name: "updated_at",
+    name: "updatedAt",
   })
   updatedAt: Date;
 
@@ -68,6 +70,13 @@ export class UserEntity {
     default: [UserRoles.User],
   })
   roles: UserRoles[];
+
+  @Column({
+    type: "boolean",
+    name: "blocked",
+    default: () => false,
+  })
+  blocked: boolean = false;
 
   @Column(() => ProfileEntity)
   profile: ProfileEntity;
